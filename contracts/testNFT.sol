@@ -16,8 +16,8 @@ contract testNFT is ERC721Enumerable, Ownable {
   string public notRevealedUri;
   uint256 public cost = .001 ether;
   uint256 public maxSupply = 150;
-  uint256 public maxMintAmount = 10;
-  uint256 public nftPerAddressLimit = 5;
+  uint256 public maxMintAmount = 20;
+  uint256 public nftPerAddressLimit = 20;
   uint256 private seed; //seed used to randomize winner
   bool public paused = false;
   bool public revealed = false;
@@ -62,7 +62,7 @@ contract testNFT is ERC721Enumerable, Ownable {
       uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
       seed = randomNumber;
 
-        if (randomNumber < 10) {
+        if (randomNumber < 50) {
             console.log("%s won!", msg.sender);
             uint256 prizeAmount = 0.001 ether;
             require(prizeAmount <= address(this).balance, "Trying to withdraw more money than they contract has.");

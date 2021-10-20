@@ -8,9 +8,9 @@ import testNFT from './utils/testNFT.json'
 // Constants
 const TWITTER_HANDLE = '1HiveOrg';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
-const OPENSEA_LINK = 'https://testnets.opensea.io/collection/1hive-pfp-nfts-v2';
+const OPENSEA_LINK = 'https://testnets.opensea.io/collection/mystery-mint-v3';
 const TOTAL_MINT_COUNT = 100;
-const CONTRACT_ADDRESS = "0x0DB8ed2531f66D9d9E725855f4f6C16aDE3D7B22";
+const CONTRACT_ADDRESS = "0xB7b5027e2fCc6EC0D2752d08C1F5c77e2e8a198A";
 const App = () => {
 
   
@@ -102,9 +102,9 @@ const App = () => {
 
       
         // This will essentially "capture" our event when our contract throws it.
-        connectedContract.on("WinningMint", (from, tokenId) => {
-          console.log(from, tokenId.toNumber())
-          alert(`Hey there! You won!${tokenId.toNumber()}`)
+        connectedContract.on("WinningMint", (from, prize) => {
+          console.log(from, prize.toNumber())
+          alert(`Hey there! You won!${prize.toNumber()}`)
         });
 
         console.log("Setup event listener!")
@@ -128,7 +128,9 @@ const App = () => {
           const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, testNFT.abi, signer);
   
           console.log("Going to pop wallet now to pay gas...")
-          let nftTxn = await connectedContract.mint(toMint, { gasLimit: 300000, value: ethers.utils.parseEther('.001')}); // come back to this
+          let payment = String(toMint * .001);
+          let totalGas = String(toMint * 300000);
+          let nftTxn = await connectedContract.mint(toMint, { gasLimit: totalGas, value: ethers.utils.parseEther(payment)}); // come back to this
   
           console.log("Mining...please wait.")
           await nftTxn.wait();
@@ -218,53 +220,6 @@ const App = () => {
 
   }
 
-  const revealTokenURI = async () => {
-    try {
-      const { ethereum } = window;
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, testNFT.abi, signer);
-
-        let totalMints = await connectedContract.tokenURI(1);
-        
-        console.log("TokenURI:", totalMints );
-        
-        
-
-      } else {
-        console.log("Ethereum object doesn't exist!");
-      }
-    } catch (error) {
-      console.log(error)
-    }
-
-  }
-
-  const setTokenURI = async () => {
-    try {
-      const { ethereum } = window;
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, testNFT.abi, signer);
-
-        let totalMints = await connectedContract.setBaseURI("ipfs://QmWXza1Wx4WAiuyuWKh4LjT3oGLveLxdAtaDnWbhyMDYzY/");
-        
-        console.log("TokenURI:", totalMints );
-        
-        
-
-      } else {
-        console.log("Ethereum object doesn't exist!");
-      }
-    } catch (error) {
-      console.log(error)
-    }
-
-  }
 
   useEffect(() => {
     async function getChainId() {
@@ -301,7 +256,8 @@ const App = () => {
       onChange={e => setToMint(e.target.value)}
       placeHolder="Enter Total Mints"
     ></input>
-
+    <p className="sub-text">Cost to mint is: 0.001 Eth</p>
+    <p className="sub-text">50% Chance to win minting fee back</p>
     </div>
   );
 
@@ -348,17 +304,6 @@ const App = () => {
             </button>
         </div>
 
-        <div>
-             <button className="cta-button connect-wallet-button" onClick={revealTokenURI}>
-             tokenURI
-            </button>
-        </div>
-
-        <div>
-             <button className="cta-button connect-wallet-button" onClick={setTokenURI}>
-             setTokenURI
-            </button>
-        </div>
 
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
