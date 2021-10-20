@@ -5,6 +5,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 
 contract testNFT is ERC721Enumerable, Ownable {
@@ -14,16 +15,20 @@ contract testNFT is ERC721Enumerable, Ownable {
   string public baseExtension = ".json";
   string public notRevealedUri;
   uint256 public cost = .001 ether;
-  uint256 public maxSupply = 100;
+  uint256 public maxSupply = 150;
   uint256 public maxMintAmount = 10;
   uint256 public nftPerAddressLimit = 5;
+  uint256 private seed; //seed used to randomize winner
   bool public paused = false;
   bool public revealed = false;
   bool public onlyWhitelisted = true;
   address[] public whitelistedAddresses;
   mapping(address => uint256) public addressMintedBalance;
 
-  constructor(string memory _name, string memory _symbol, string memory _initBaseURI, string memory _initNotRevealedUri) ERC721(_name, _symbol) {
+  //Emit even to send out winning  
+  event WinningMint(address sender, uint256 prize);
+
+  constructor(string memory _name, string memory _symbol, string memory _initBaseURI, string memory _initNotRevealedUri) ERC721(_name, _symbol) payable {
     setBaseURI(_initBaseURI);
     setNotRevealedURI(_initNotRevealedUri);
   }
@@ -53,6 +58,22 @@ contract testNFT is ERC721Enumerable, Ownable {
     for (uint256 i = 1; i <= _mintAmount; i++) {
       addressMintedBalance[msg.sender]++;
       _safeMint(msg.sender, supply + i);
+      /*adding in random reward system */
+      uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
+      seed = randomNumber;
+
+        if (randomNumber < 10) {
+            console.log("%s won!", msg.sender);
+            uint256 prizeAmount = 0.001 ether;
+            require(prizeAmount <= address(this).balance, "Trying to withdraw more money than they contract has.");
+            (bool success, ) = (msg.sender).call{value: prizeAmount}("");
+            require(success, "Failed to withdraw money from contract.");
+
+            //emit event of winning
+            emit WinningMint(msg.sender, prizeAmount);
+        }
+      /* ----------------------------*/
+      
     }
   }
   

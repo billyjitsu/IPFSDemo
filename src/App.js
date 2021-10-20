@@ -10,13 +10,14 @@ const TWITTER_HANDLE = '1HiveOrg';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const OPENSEA_LINK = 'https://testnets.opensea.io/collection/1hive-pfp-nfts-v2';
 const TOTAL_MINT_COUNT = 100;
-const CONTRACT_ADDRESS = "0x36658597B547f4EaD7359AF6134256E38EC127a4";
+const CONTRACT_ADDRESS = "0x0DB8ed2531f66D9d9E725855f4f6C16aDE3D7B22";
 const App = () => {
 
   
   const [currentAccount, setCurrentAccount] = useState("");
   const [chainId, setChainId] = useState(window.ethereum.request({ method: 'eth_chainId' }));
   const [mintTotal, setMintTotal] = useState(0);
+  const [toMint, setToMint] = useState(0);
 
   const checkIfWalletIsConnected = async () => {
     /*
@@ -89,21 +90,21 @@ const App = () => {
 
   // Setup our listener.
   const setupEventListener = async () => {
-    // Most of this looks the same as our function askContractToMintNft
+
     try {
       const { ethereum } = window;
 
       if (ethereum) {
-        // Same stuff again
+        
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, testNFT.abi, signer);
 
       
         // This will essentially "capture" our event when our contract throws it.
-        connectedContract.on("NewEpicNFTMinted", (from, tokenId) => {
+        connectedContract.on("WinningMint", (from, tokenId) => {
           console.log(from, tokenId.toNumber())
-          alert(`Hey there! We've minted your NFT and sent it to your wallet. It may be blank right now. It can take a max of 10 min to show up on OpenSea. Here's the link: https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}`)
+          alert(`Hey there! You won!${tokenId.toNumber()}`)
         });
 
         console.log("Setup event listener!")
@@ -127,7 +128,7 @@ const App = () => {
           const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, testNFT.abi, signer);
   
           console.log("Going to pop wallet now to pay gas...")
-          let nftTxn = await connectedContract.mint(1);
+          let nftTxn = await connectedContract.mint(toMint, { gasLimit: 300000, value: ethers.utils.parseEther('.001')}); // come back to this
   
           console.log("Mining...please wait.")
           await nftTxn.wait();
@@ -291,9 +292,17 @@ const App = () => {
   * We want the "Connect to Wallet" button to dissapear if they've already connected their wallet!
   */
   const renderMintUI = () => (
+    <div>
     <button onClick={askContractToMintNft} className="cta-button connect-wallet-button">
       Mint NFT
     </button>
+    <p></p>
+    <input
+      onChange={e => setToMint(e.target.value)}
+      placeHolder="Enter Total Mints"
+    ></input>
+
+    </div>
   );
 
 
