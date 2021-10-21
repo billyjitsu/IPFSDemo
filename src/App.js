@@ -10,7 +10,7 @@ const TWITTER_HANDLE = '1HiveOrg';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const OPENSEA_LINK = 'https://testnets.opensea.io/collection/mystery-mint-v3';
 const TOTAL_MINT_COUNT = 100;
-const CONTRACT_ADDRESS = "0xB7b5027e2fCc6EC0D2752d08C1F5c77e2e8a198A";
+const CONTRACT_ADDRESS = "0x67139925a4FFc0bc89dbc94DaF8Bd67e274F2B51";
 const App = () => {
 
   
