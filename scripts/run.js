@@ -5,6 +5,7 @@ const main = async () => {
       "MYS", 
       "ipfs://QmWXza1Wx4WAiuyuWKh4LjT3oGLveLxdAtaDnWbhyMDYzY/", 
       "ipfs://QmWFbcEmC9PFaWWjDvincjacEm32pak8vT272Zwy98pMkV/1.json",  //hidden NFT
+      "0x834c88758EeE333b01e52D6de610166E19E6CCd3",
       {
         value: hre.ethers.utils.parseEther('1'),
       }

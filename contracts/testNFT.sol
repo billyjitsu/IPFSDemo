@@ -6,19 +6,31 @@ pragma solidity >=0.7.0 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
+//Import External Token
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "hardhat/console.sol";
 
 
 contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
   using Strings for uint256;
+  //bring in token standards
+  using Address for address;
+  using SafeERC20 for IERC20;
+  //Bring in token
+  IERC20 private token;
 
   string public baseURI;
   string public baseExtension = ".json";
   string public notRevealedUri;
-  uint256 public cost = .001 ether;
+  uint256 public cost = 1 * 10 **16; //.001 token
+  //uint256 public cost = .001 ether;
   uint256 public maxSupply = 150;
   uint256 public maxMintAmount = 20;
   uint256 public nftPerAddressLimit = 20;
+  uint256 prizeAmount = 0.001 ether; // prize amount
   uint256 private seed; //seed used to randomize winner
   uint256[] private _teamShares = [50, 50]; // Setup payment splitter shares
   bool public paused = false;
@@ -34,10 +46,11 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
   //Emit even to send out winning  
   event WinningMint(address sender, uint256 prize);
 
-  constructor(string memory _name, string memory _symbol, string memory _initBaseURI, string memory _initNotRevealedUri) 
+  constructor(string memory _name, string memory _symbol, string memory _initBaseURI, string memory _initNotRevealedUri, address _token) 
     ERC721(_name, _symbol) PaymentSplitter(_team, _teamShares) payable {
     setBaseURI(_initBaseURI);
     setNotRevealedURI(_initNotRevealedUri);
+    token = IERC20(_token);
   }
 
   // internal
@@ -72,7 +85,7 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
 
         if (randomNumber < 50) {
             console.log("%s won!", msg.sender);
-            uint256 prizeAmount = 0.001 ether;
+            
             require(prizeAmount <= address(this).balance, "Trying to withdraw more money than they contract has.");
             (bool success, ) = (msg.sender).call{value: prizeAmount}("");
             require(success, "Failed to withdraw money from contract.");
@@ -159,6 +172,7 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
     whitelistedAddresses = _users;
   }
  
+  // to be removed it payable function is primary
   function withdraw() public payable onlyOwner {
     (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
     require(success);
