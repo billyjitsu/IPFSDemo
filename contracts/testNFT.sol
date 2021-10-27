@@ -5,16 +5,14 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
 //Import External Token
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "hardhat/console.sol";
 
 
-contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
+contract testNFT is ERC721Enumerable, Ownable {
   using Strings for uint256;
   //bring in token standards
   using Address for address;
@@ -32,22 +30,18 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
   uint256 public nftPerAddressLimit = 20;
   uint256 prizeAmount = 0.001 ether; // prize amount
   uint256 private seed; //seed used to randomize winner
-  uint256[] private _teamShares = [50, 50]; // Setup payment splitter shares
   bool public paused = false;
   bool public revealed = false;
   bool public onlyWhitelisted = true;
   address[] public whitelistedAddresses;
-  address[] private _team = [
-        0xe2b8651bF50913057fF47FC4f02A8e12146083B8,
-        0x6961367Ef8b92c1a306a68C87ADD9Eafd09f7787
-    ];
+ 
   mapping(address => uint256) public addressMintedBalance;
 
   //Emit even to send out winning  
   event WinningMint(address sender, uint256 prize);
 
   constructor(string memory _name, string memory _symbol, string memory _initBaseURI, string memory _initNotRevealedUri, address _token) 
-    ERC721(_name, _symbol) PaymentSplitter(_team, _teamShares) payable {
+    ERC721(_name, _symbol) payable {
     setBaseURI(_initBaseURI);
     setNotRevealedURI(_initNotRevealedUri);
     token = IERC20(_token);
@@ -59,7 +53,8 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
   }
 
   // public
-  function mint(uint256 _mintAmount) public payable {
+  // must approve new token First    //added payment variable
+  function mint(uint256 _mintAmount, uint256 _payment) public payable {
     require(!paused, "the contract is paused");
     uint256 supply = totalSupply();
     require(_mintAmount > 0, "need to mint at least 1 NFT");
@@ -72,7 +67,10 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
             uint256 ownerMintedCount = addressMintedBalance[msg.sender];
             require(ownerMintedCount + _mintAmount <= nftPerAddressLimit, "max NFT per address exceeded");
         }
-        require(msg.value >= cost * _mintAmount, "insufficient funds");
+       // require(msg.value >= cost * _mintAmount, "insufficient funds");
+        require(_payment >= cost * _mintAmount, "insufficient funds");
+        //transfer token in after approval
+        token.safeTransferFrom(msg.sender, address(this), _payment);
     }
 
     for (uint256 i = 1; i <= _mintAmount; i++) {
@@ -86,9 +84,11 @@ contract testNFT is ERC721Enumerable, Ownable, PaymentSplitter {
         if (randomNumber < 50) {
             console.log("%s won!", msg.sender);
             
-            require(prizeAmount <= address(this).balance, "Trying to withdraw more money than they contract has.");
-            (bool success, ) = (msg.sender).call{value: prizeAmount}("");
-            require(success, "Failed to withdraw money from contract.");
+            //require(prizeAmount <= address(this).balance, "Trying to withdraw more money than they contract has.");
+            require(prizeAmount <= token.balanceOf(address(this)), "Trying to withdraw more money than they contract has.");
+            token.safeTransfer(msg.sender, prizeAmount);
+            //(bool success, ) = (msg.sender).call{value: prizeAmount}("");
+            //require(success, "Failed to withdraw money from contract.");
 
             //emit event of winning
             emit WinningMint(msg.sender, prizeAmount);

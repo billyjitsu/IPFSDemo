@@ -2,7 +2,9 @@ import './styles/App.css';
 import { ethers } from 'ethers'
 import twitterLogo from './assets/twitter-logo.svg';
 import React, { useEffect, useState } from "react";
-import testNFT from './utils/testNFT.json'
+import testNFT from './utils/testNFT.json';
+import Agave from './utils/Agave.json';
+import Token from './utils/Token.json';
 
 
 // Constants
@@ -10,7 +12,9 @@ const TWITTER_HANDLE = '1HiveOrg';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const OPENSEA_LINK = 'https://testnets.opensea.io/collection/mystery-mint-v3';
 const TOTAL_MINT_COUNT = 100;
-const CONTRACT_ADDRESS = "0x3DBae72d5525aE524BFFB717C5fA3531F4288FeC";
+const CONTRACT_ADDRESS = "0xcFa55c28371C5cF334dB2F7BF158b499585350E1";
+const AGAVE_ADDRESS = "0x550c6e72f243f2e506585ae3a8a8cbfbed8e0ec0";
+const TOKEN_ADDRESS = "0x2F66AB44faeae631e1a921a48926ce927227595f";
 const App = () => {
 
   
@@ -117,6 +121,21 @@ const App = () => {
     }
   }
 
+  const approve = async () => {
+    try {
+      const { ethereum } = window;
+        if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const mcontract = new ethers.Contract(AGAVE_ADDRESS, Agave.abi, signer)
+        await mcontract.approve(CONTRACT_ADDRESS, ethers.utils.parseEther("0"))
+        }
+    }  catch (error) {
+      console.log(error)
+    }  
+  }
+
+
   const askContractToMintNft = async () => {
     
       try {
@@ -126,11 +145,13 @@ const App = () => {
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
           const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, testNFT.abi, signer);
-  
+         // const agaveContract = new ethers.Contract(AGAVE_ADDRESS, Agave.abi, provider);
+
           console.log("Going to pop wallet now to pay gas...")
-          let payment = String(toMint * .001);
-          let totalGas = String(toMint * 300000);
-          let nftTxn = await connectedContract.mint(toMint, { gasLimit: totalGas, value: ethers.utils.parseEther(payment)}); // come back to this
+          //let payment = String(toMint * .001);
+          let payment = String(1 * 10 **16);
+          let totalGas = String(toMint * 3000000);
+          let nftTxn = await connectedContract.mint(toMint, payment , { gasLimit: totalGas }); // come back to this
   
           console.log("Mining...please wait.")
           await nftTxn.wait();
@@ -296,6 +317,13 @@ const App = () => {
             target="_blank"
             rel="noreferrer"
           >{`🌊 View Collection on OpenSea`}</a></p>
+        </div>
+
+
+        <div>
+             <button className="cta-button connect-wallet-button" onClick={approve}>
+             Approve
+            </button>
         </div>
 
         <div>

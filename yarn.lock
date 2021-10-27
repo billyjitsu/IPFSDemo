@@ -2311,10 +2311,12 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@solidity-parser/parser@^0.11.0":
-  "integrity" "sha512-H8BSBoKE8EubJa0ONqecA2TviT3TnHeC4NpgnAHSUiuhZoQBfPB4L2P9bs8R6AoTW10Endvh3vc+fomVMIDIYQ=="
-  "resolved" "https://registry.npmjs.org/@solidity-parser/parser/-/parser-0.11.1.tgz"
-  "version" "0.11.1"
+"@solidity-parser/parser@^0.14.0":
+  "integrity" "sha512-cX0JJRcmPtNUJpzD2K7FdA7qQsTOk1UZnFx2k7qAg9ZRvuaH5NBe5IEdBMXGlmf2+FmjhqbygJ26H8l2SV7aKQ=="
+  "resolved" "https://registry.npmjs.org/@solidity-parser/parser/-/parser-0.14.0.tgz"
+  "version" "0.14.0"
+  dependencies:
+    "antlr4ts" "^0.5.0-alpha.4"
 
 "@surma/rollup-plugin-off-main-thread@^1.1.1":
   "integrity" "sha512-yBMPqmd1yEJo/280PAMkychuaALyQ9Lkb5q1ck3mjJrFuEobIfhnQ4J3mbvBoISmR3SWMWV+cGB/I0lCQee79A=="
@@ -3370,6 +3372,11 @@
   "integrity" "sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA=="
   "resolved" "https://registry.npmjs.org/ansi-styles/-/ansi-styles-5.2.0.tgz"
   "version" "5.2.0"
+
+"antlr4ts@^0.5.0-alpha.4":
+  "integrity" "sha512-WPQDt1B74OfPv/IMS2ekXAKkTZIHl88uMetg6q3OTqgFxZ/dxDXI0EWLyZid/1Pe6hTftyg5N7gel5wNAGxXyQ=="
+  "resolved" "https://registry.npmjs.org/antlr4ts/-/antlr4ts-0.5.0-alpha.4.tgz"
+  "version" "0.5.0-alpha.4"
 
 "anymatch@^2.0.0":
   "integrity" "sha512-5teOsQWABXHHBFP9y3skS5P3d/WfWXpv3FUpy+LorMrNYaT9pI4oLMQX7jzQ2KklNpGpWHzdCXTDT2Y3XGlZBw=="
@@ -8524,10 +8531,10 @@
     "ajv" "^6.12.3"
     "har-schema" "^2.0.0"
 
-"hardhat@^2.0.0", "hardhat@^2.0.4", "hardhat@^2.6.6":
-  "integrity" "sha512-GneZAwvNxf3cNobYTmMSp2qGX/yJyUmHD/xjW+8zF2AgWkLS33CHmGn4aRFKqfjsk7BS7FU6jqMmmZhHHO3gUw=="
-  "resolved" "https://registry.npmjs.org/hardhat/-/hardhat-2.6.6.tgz"
-  "version" "2.6.6"
+"hardhat@^2.0.0", "hardhat@^2.0.4", "hardhat@^2.6.7":
+  "integrity" "sha512-Mua01f6ZN1feQLktHSH2p5A5LCdA+Wf7+O2lJDH6wClvWPtI2eqKNNY2gxBwYXoQ28GZrT3K6mqQOZeRWAca6Q=="
+  "resolved" "https://registry.npmjs.org/hardhat/-/hardhat-2.6.7.tgz"
+  "version" "2.6.7"
   dependencies:
     "@ethereumjs/block" "^3.4.0"
     "@ethereumjs/blockchain" "^5.4.0"
@@ -8536,7 +8543,7 @@
     "@ethereumjs/vm" "^5.5.2"
     "@ethersproject/abi" "^5.1.2"
     "@sentry/node" "^5.18.1"
-    "@solidity-parser/parser" "^0.11.0"
+    "@solidity-parser/parser" "^0.14.0"
     "@types/bn.js" "^5.1.0"
     "@types/lru-cache" "^5.1.0"
     "abort-controller" "^3.0.0"
