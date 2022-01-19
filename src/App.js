@@ -3,6 +3,28 @@ import { ethers } from 'ethers'
 import twitterLogo from './assets/twitter-logo.svg';
 import React, { useEffect, useState } from "react";
 import testNFT from './utils/testNFT.json'
+//metamask  injector
+import { InjectedConnector } from '@web3-react/injected-connector'
+// portis injector
+import { PortisConnector } from '@web3-react/portis-connector'
+
+//starting from other blog
+import { Web3ReactProvider } from '@web3-react/core'
+import { Web3Provider } from "@ethersproject/providers";
+
+function getLibrary(provider, connector) {
+  return new Web3Provider(provider);
+}
+//////
+
+export const injectedProvider = new InjectedConnector({ supportedChainIds: [4] });
+/*
+export const portis = new PortisConnector({ 
+  dAppId: "d2b6ea56-7e65-4096-92af-7a1cb9433328",
+  network: [4] 
+});
+*/
+
 
 
 // Constants
@@ -57,6 +79,23 @@ const App = () => {
       console.log("No authorized account found")
     }
   }
+
+  //using for web3 libraries
+  /*
+  export const injected = new InjectedConnector({
+    supportedChainIds: [1, 3, 4, 5, 42],
+  })
+  */
+
+  ////////// Trying a new wallet connect////
+  const handleConnect = (connector: any) => {
+    // read-only
+    let ethersProvider = new ethers.providers.JsonRpcProvider(process.env.API_ENDPOINT);
+    let { provider } = connector.activate();
+    // signer
+    const signer = provider.getSigner();
+    ethersProvider = new Web3Provider(signer);
+    }
 
   /*
   * Implement your connectWallet method here
@@ -238,10 +277,23 @@ const App = () => {
 
   // Render Methods
   const renderNotConnectedContainer = () => (
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <button onClick={ connectWallet } className="cta-button connect-wallet-button">
+       Connect to Wallet
+      </button>
+    </Web3ReactProvider>
+  );
+  
+  
+  
+  /*
+  // Render Methods
+  const renderNotConnectedContainer = () => (
     <button onClick={ connectWallet } className="cta-button connect-wallet-button">
       Connect to Wallet
     </button>
   );
+  */
 
   /*
   * We want the "Connect to Wallet" button to dissapear if they've already connected their wallet!
@@ -287,22 +339,6 @@ const App = () => {
             </div>
         </div>
         )}
-          
-        <div>
-          <p className="sub-text">
-          <a
-      
-            href={OPENSEA_LINK}
-            target="_blank"
-            rel="noreferrer"
-          >{`🌊 View Collection on OpenSea`}</a></p>
-        </div>
-
-        <div>
-             <button className="cta-button connect-wallet-button" onClick={revealNFT}>
-             Reveal NFT - admin
-            </button>
-        </div>
 
 
         <div className="footer-container">
