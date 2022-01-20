@@ -3,21 +3,50 @@ import { ethers } from 'ethers'
 import twitterLogo from './assets/twitter-logo.svg';
 import React, { useEffect, useState } from "react";
 import testNFT from './utils/testNFT.json'
-//metamask  injector
+//not really metamask?  injector
 import { InjectedConnector } from '@web3-react/injected-connector'
 // portis injector
 import { PortisConnector } from '@web3-react/portis-connector'
+// wallet connect injector
+import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 
 //starting from other blog
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from "@ethersproject/providers";
+import { useWeb3React } from "@web3-react/core";
 
+
+/*
 function getLibrary(provider, connector) {
   return new Web3Provider(provider);
 }
+*/
+
+function getLibrary(provider) {
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
+}
+
+/* i think for web3 library
+function getLibrary(provider) {
+  return new Web3(provider)
+}
+*/
 //////
 
-export const injectedProvider = new InjectedConnector({ supportedChainIds: [4] });
+export interface AbstractConnectorArguments {
+  supportedChainIds?: number[]
+}
+
+// export const injectedProvider = new InjectedConnector({ supportedChainIds: [4] });
+
+export const injected = new InjectedConnector({
+  supportedChainIds: [1, 3, 4, 5, 42],
+})
+
+
+
 /*
 export const portis = new PortisConnector({ 
   dAppId: "d2b6ea56-7e65-4096-92af-7a1cb9433328",
@@ -26,13 +55,14 @@ export const portis = new PortisConnector({
 */
 
 
-
 // Constants
 const TWITTER_HANDLE = '1HiveOrg';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const OPENSEA_LINK = 'https://testnets.opensea.io/collection/mystery-mint-v3';
 const TOTAL_MINT_COUNT = 100;
 const CONTRACT_ADDRESS = "0x67139925a4FFc0bc89dbc94DaF8Bd67e274F2B51";
+
+
 const App = () => {
 
   
@@ -40,6 +70,9 @@ const App = () => {
   const [chainId, setChainId] = useState(window.ethereum.request({ method: 'eth_chainId' }));
   const [mintTotal, setMintTotal] = useState(0);
   const [toMint, setToMint] = useState(0);
+
+  //web3-react
+  const { active, account, library, connector, activate, deactivate } = useWeb3React()
 
   const checkIfWalletIsConnected = async () => {
     /*
@@ -86,11 +119,21 @@ const App = () => {
     supportedChainIds: [1, 3, 4, 5, 42],
   })
   */
+   
+  async function connect() {
+    try {
+      await activate(injected)
+      console.log(injected, "injected");
+    } catch (ex) {
+      console.log(ex)
+    }
+  }
+
 
   ////////// Trying a new wallet connect////
   const handleConnect = (connector: any) => {
     // read-only
-    let ethersProvider = new ethers.providers.JsonRpcProvider(process.env.API_ENDPOINT);
+    let ethersProvider = new ethers.providers.JsonRpcProvider("https://eth-rinkeby.alchemyapi.io/v2/8PUcy84oYeKpgH6ys_Q5K4RO7-X6m5l3");
     let { provider } = connector.activate();
     // signer
     const signer = provider.getSigner();
@@ -277,11 +320,11 @@ const App = () => {
 
   // Render Methods
   const renderNotConnectedContainer = () => (
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <button onClick={ connectWallet } className="cta-button connect-wallet-button">
+    <div>
+      <button onClick={ connect } className="cta-button connect-wallet-button">
        Connect to Wallet
       </button>
-    </Web3ReactProvider>
+    </div>
   );
   
   
@@ -355,4 +398,11 @@ const App = () => {
   );
 };
 
-export default App;
+//export default App;
+export default function () {
+  return (
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <App />
+    </Web3ReactProvider>
+  );
+}
