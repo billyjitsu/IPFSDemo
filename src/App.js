@@ -45,7 +45,10 @@ export const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42],
 })
 
-
+export const walletconnect = new WalletConnectConnector({
+  rpc: { 4: 'https://rinkeby.infura.io/v3/84842078b09946638c03157f83405213' },
+  qrcode: true
+})
 
 /*
 export const portis = new PortisConnector({ 
@@ -72,7 +75,9 @@ const App = () => {
   const [toMint, setToMint] = useState(0);
 
   //web3-react
-  const { active, account, library, connector, activate, deactivate } = useWeb3React()
+  //const { active, account, library, connector, activate, deactivate } = useWeb3React();
+  const { connector, activate, active, account } = useWeb3React();
+
 
   const checkIfWalletIsConnected = async () => {
     /*
@@ -129,6 +134,27 @@ const App = () => {
     }
   }
 
+  async function wallectConnect() {
+  activate(walletconnect, undefined, true)
+    .catch((error) => {
+        if (error) {
+            console.log("someting happened")
+           // activate(walletconnect)
+        } else {
+            console.log('Pending Error Occured')
+        }
+    })
+  }
+
+  /* setTimeout(() => 
+  activate(walletconnect, undefined, true)
+    .catch((error) => {
+        if (error) {
+            activate(walletconnect)
+        } else {
+            console.log('Pending Error Occured')
+        }
+    }) 500)    */
 
   ////////// Trying a new wallet connect////
   const handleConnect = (connector: any) => {
@@ -321,7 +347,7 @@ const App = () => {
   // Render Methods
   const renderNotConnectedContainer = () => (
     <div>
-      <button onClick={ connect } className="cta-button connect-wallet-button">
+      <button onClick={ wallectConnect } className="cta-button connect-wallet-button">
        Connect to Wallet
       </button>
     </div>
