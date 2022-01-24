@@ -173,8 +173,9 @@ contract testNFT is ERC721Enumerable, Ownable {
   }
  
   // to be removed it payable function is primary
-  function withdraw() public payable onlyOwner {
-    (bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
-    require(success);
+  function withdraw(uint256 amount) public payable onlyOwner {
+    token.safeTransfer(msg.sender, amount);
+    //(bool success, ) = payable(msg.sender).call{value: address(this).balance}("");
+    //require(success);
   }
 }
