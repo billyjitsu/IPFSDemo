@@ -13,7 +13,10 @@ import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 //starting from other blog
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React } from "@web3-react/core";
+//import { useWeb3React } from "@web3-react/core";
+
+import { providers } from "ethers";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 
 /*
@@ -46,9 +49,14 @@ export const injected = new InjectedConnector({
 })
 
 export const walletconnect = new WalletConnectConnector({
-  rpc: { 4: 'https://rinkeby.infura.io/v3/84842078b09946638c03157f83405213' },
+  rpc: { 1: 'https://mainnet.infura.io/v3/638a65e28a0c4af1a585bdb35be46264' },
   qrcode: true
 })
+
+
+const provider = new WalletConnectProvider({
+  infuraId: "638a65e28a0c4af1a585bdb35be46264",
+});
 
 /*
 export const portis = new PortisConnector({ 
@@ -76,7 +84,7 @@ const App = () => {
 
   //web3-react
   //const { active, account, library, connector, activate, deactivate } = useWeb3React();
-  const { connector, activate, active, account } = useWeb3React();
+  //const { connector, activate, active, account } = useWeb3React();
 
 
   const checkIfWalletIsConnected = async () => {
@@ -127,24 +135,49 @@ const App = () => {
    
   async function connect() {
     try {
-      await activate(injected)
+  //    await activate(injected)
       console.log(injected, "injected");
     } catch (ex) {
       console.log(ex)
     }
   }
-
+/*
   async function wallectConnect() {
   activate(walletconnect, undefined, true)
     .catch((error) => {
         if (error) {
-            console.log("someting happened")
+            console.log("something happened")
            // activate(walletconnect)
         } else {
             console.log('Pending Error Occured')
         }
     })
   }
+*/
+  
+  async function wallectConnect() {
+    try {
+        await provider.enable();
+      //await activate(walletconnect, undefined, true)
+        console.log("something happened")
+        //const { ethereum } = window;
+        const web3Provider = new providers.Web3Provider(provider);
+        console.log('web3Provider', web3Provider);
+
+
+        const accounts = await Web3Provider.provider.request({ method: "eth_requestAccounts" });
+        console.log("accounts", accounts);
+  
+      /*
+      * Boom! This should print out public address once we authorize Metamask.
+      */
+      //console.log("Connected", accounts[0]);
+
+          } catch (error){
+              console.log('Error', error);
+          }
+    }
+    
 
   /* setTimeout(() => 
   activate(walletconnect, undefined, true)
@@ -349,6 +382,11 @@ const App = () => {
     <div>
       <button onClick={ wallectConnect } className="cta-button connect-wallet-button">
        Connect to Wallet
+      </button>
+      <br/>
+      <br/>
+      <button onClick={ connect } className="cta-button connect-wallet-button">
+       Injected Connect
       </button>
     </div>
   );
